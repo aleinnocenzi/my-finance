@@ -2,8 +2,8 @@
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { SpendingBucket } from "@/lib/spendingGrouping";
-import { formatCurrency } from "@/lib/format";
 import type { Locale } from "@/lib/i18n/config";
+import { CurrencyTooltip } from "./ChartTooltip";
 
 export function SpendingByCategoryChart({
   buckets,
@@ -33,16 +33,7 @@ export function SpendingByCategoryChart({
             <Cell key={bucket.key} fill={bucket.color} stroke="#0a0a0f" strokeWidth={2} />
           ))}
         </Pie>
-        <Tooltip
-          formatter={(value: number) => formatCurrency(value, locale)}
-          contentStyle={{
-            background: "#0a0a0f",
-            border: "1px solid #26263a",
-            borderRadius: 8,
-            fontSize: 12,
-          }}
-          labelStyle={{ color: "#e5e7eb" }}
-        />
+        <Tooltip content={<CurrencyTooltip locale={locale} />} />
         <Legend
           layout="vertical"
           verticalAlign="middle"

@@ -17,7 +17,7 @@ export default async function AccountsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-100">{t.accounts.title}</h1>
           <p className="mt-1 text-sm text-neutral">{t.accounts.subtitle}</p>
@@ -25,7 +25,7 @@ export default async function AccountsPage() {
         <AddAccountModal />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard label={t.overview.netWorth} value={netWorth.netWorth} tone="accent" locale={locale} />
         <StatCard label={t.overview.assets} value={netWorth.totalAssets} tone="neutral" locale={locale} />
         <StatCard label={t.overview.liabilities} value={netWorth.totalLiabilities} tone="expense" locale={locale} />

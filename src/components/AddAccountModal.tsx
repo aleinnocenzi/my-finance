@@ -40,7 +40,7 @@ export function AddAccountModal() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-8 sm:items-center">
           <div className="w-full max-w-md rounded-xl border border-surface-border bg-surface p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-100">{t.accounts.addHeading}</h2>
@@ -61,7 +61,7 @@ export function AddAccountModal() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-neutral">{t.accounts.typeLabel}</label>
                   <select

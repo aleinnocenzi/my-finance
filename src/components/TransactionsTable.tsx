@@ -28,8 +28,8 @@ export function TransactionsTable({
             <th className="py-2 pr-4">{t.transactions.tableDate}</th>
             <th className="py-2 pr-4">{t.transactions.tableName}</th>
             <th className="py-2 pr-4">{t.transactions.tableCategory}</th>
-            <th className="py-2 pr-4">{t.transactions.tableAccount}</th>
-            <th className="py-2 pr-4">{t.transactions.tableHoliday}</th>
+            <th className="hidden py-2 pr-4 sm:table-cell">{t.transactions.tableAccount}</th>
+            <th className="hidden py-2 pr-4 md:table-cell">{t.transactions.tableHoliday}</th>
             <th className="py-2 pr-4 text-right">{t.transactions.tableAmount}</th>
             <th className="py-2 pr-2" />
           </tr>
@@ -51,8 +51,8 @@ export function TransactionsTable({
                     {tx.category.name}
                   </span>
                 </td>
-                <td className="py-2.5 pr-4 text-neutral">{tx.account.name}</td>
-                <td className="py-2.5 pr-4 text-neutral">{holiday ? holiday.name : "—"}</td>
+                <td className="hidden py-2.5 pr-4 text-neutral sm:table-cell">{tx.account.name}</td>
+                <td className="hidden py-2.5 pr-4 text-neutral md:table-cell">{holiday ? holiday.name : "—"}</td>
                 <td
                   className={`py-2.5 pr-4 text-right font-medium whitespace-nowrap ${
                     tx.category.kind === "income" ? "text-income" : "text-expense"

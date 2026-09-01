@@ -33,7 +33,7 @@ export function AccountBalanceForm({ account }: { account: Account }) {
 
   return (
     <div className="rounded-lg border border-surface-border bg-background px-4 py-3">
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="min-w-0">
         <p className="truncate text-sm font-medium text-gray-100">{account.name}</p>
         <p className="text-xs text-neutral">
