@@ -318,6 +318,9 @@ export const en: Dictionary = {
     Crypto: "Crypto",
     Salary: "Salary",
     Interests: "Interests",
+    Services: "Services",
+    Parking: "Parking",
+    Subscription: "Subscriptions",
   },
 };
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 export function DateRangeFilter({
@@ -34,9 +35,9 @@ export function DateRangeFilter({
         {t.overview.apply}
       </button>
       {isCustom && (
-        <a href="/" className="rounded-lg px-3 py-2 text-sm text-neutral hover:text-gray-100">
+        <Link href="/" className="rounded-lg px-3 py-2 text-sm text-neutral hover:text-gray-100">
           {t.overview.resetRange}
-        </a>
+        </Link>
       )}
     </form>
   );

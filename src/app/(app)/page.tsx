@@ -1,4 +1,4 @@
-import { subMonths, startOfMonth, formatISO, isValid, parseISO } from "date-fns";
+import { startOfMonth, formatISO, isValid, parseISO } from "date-fns";
 import { getAccounts, getBalanceHistory, getCategories, getHolidays, getTransactions } from "@/lib/data";
 import { summarizeNetWorth, computeNetWorthTimeline } from "@/lib/netWorth";
 import { groupExpensesForChart, groupExpensesByMonth } from "@/lib/spendingGrouping";
@@ -30,8 +30,8 @@ export default async function OverviewPage({
   const params = await searchParams;
   const { locale, t } = await getT();
 
-  // Default range: the last 6 months up to today.
-  const defaultFrom = isoDate(startOfMonth(subMonths(new Date(), 5)));
+  // Default range: the current month up to today.
+  const defaultFrom = isoDate(startOfMonth(new Date()));
   const defaultTo = isoDate(new Date());
   let rangeFrom = validDate(params.from) ?? defaultFrom;
   let rangeTo = validDate(params.to) ?? defaultTo;
