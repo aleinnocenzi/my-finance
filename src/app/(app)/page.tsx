@@ -1,10 +1,11 @@
-import { subMonths, startOfMonth, formatISO } from "date-fns";
+import { subMonths, startOfMonth, formatISO, isValid, parseISO } from "date-fns";
 import { getAccounts, getBalanceHistory, getCategories, getHolidays, getTransactions } from "@/lib/data";
 import { summarizeNetWorth, computeNetWorthTimeline } from "@/lib/netWorth";
 import { groupExpensesForChart, groupExpensesByMonth } from "@/lib/spendingGrouping";
 import { groupIncomeVsExpenseByMonth } from "@/lib/incomeExpense";
 import { getT } from "@/lib/i18n/server";
 import { localizeCategories, localizeTransactions } from "@/lib/i18n/localize";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 import { StatCard } from "@/components/StatCard";
 import { Card } from "@/components/ui/Card";
 import { AddTransactionModal } from "@/components/AddTransactionModal";
@@ -15,16 +16,33 @@ import { IncomeVsExpenseChart } from "@/components/charts/IncomeVsExpenseChart";
 import { NetWorthTrendChart } from "@/components/charts/NetWorthTrendChart";
 import { formatCurrency, formatDate } from "@/lib/format";
 
-export default async function OverviewPage() {
+const isoDate = (d: Date) => formatISO(d, { representation: "date" });
+
+function validDate(value?: string): string | undefined {
+  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) && isValid(parseISO(value)) ? value : undefined;
+}
+
+export default async function OverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string; to?: string }>;
+}) {
+  const params = await searchParams;
   const { locale, t } = await getT();
-  const sixMonthsAgo = formatISO(startOfMonth(subMonths(new Date(), 5)), { representation: "date" });
-  const currentMonthStart = formatISO(startOfMonth(new Date()), { representation: "date" });
+
+  // Default range: the last 6 months up to today.
+  const defaultFrom = isoDate(startOfMonth(subMonths(new Date(), 5)));
+  const defaultTo = isoDate(new Date());
+  let rangeFrom = validDate(params.from) ?? defaultFrom;
+  let rangeTo = validDate(params.to) ?? defaultTo;
+  if (rangeFrom > rangeTo) [rangeFrom, rangeTo] = [rangeTo, rangeFrom];
+  const isCustomRange = rangeFrom !== defaultFrom || rangeTo !== defaultTo;
 
   const [accounts, rawCategories, holidays, rawTransactions, history] = await Promise.all([
     getAccounts(),
     getCategories(),
     getHolidays(),
-    getTransactions({ since: sixMonthsAgo }),
+    getTransactions({ since: rangeFrom, until: rangeTo }),
     getBalanceHistory(),
   ]);
 
@@ -35,13 +53,12 @@ export default async function OverviewPage() {
   const netWorthTimeline = computeNetWorthTimeline(accounts, history);
 
   const expenseTx = transactions.filter((tx) => tx.category.kind === "expense");
-  const currentMonthExpenses = expenseTx.filter((tx) => tx.occurred_on >= currentMonthStart);
-  const currentMonthIncome = transactions
-    .filter((tx) => tx.category.kind === "income" && tx.occurred_on >= currentMonthStart)
+  const periodIncome = transactions
+    .filter((tx) => tx.category.kind === "income")
     .reduce((sum, tx) => sum + tx.amount, 0);
-  const currentMonthSpend = currentMonthExpenses.reduce((sum, tx) => sum + tx.amount, 0);
+  const periodSpend = expenseTx.reduce((sum, tx) => sum + tx.amount, 0);
 
-  const spendingBuckets = groupExpensesForChart(currentMonthExpenses, holidays);
+  const spendingBuckets = groupExpensesForChart(expenseTx, holidays);
   const { series: monthlySeries, bucketKeys } = groupExpensesByMonth(expenseTx, holidays);
   const incomeVsExpense = groupIncomeVsExpenseByMonth(transactions);
 
@@ -57,12 +74,14 @@ export default async function OverviewPage() {
         <AddTransactionModal categories={categories} accounts={accounts} />
       </div>
 
+      <DateRangeFilter from={rangeFrom} to={rangeTo} isCustom={isCustomRange} t={t} />
+
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatCard label={t.overview.netWorth} value={netWorth.netWorth} tone="accent" locale={locale} />
         <StatCard label={t.overview.assets} value={netWorth.totalAssets} tone="neutral" locale={locale} />
         <StatCard label={t.overview.liabilities} value={netWorth.totalLiabilities} tone="expense" locale={locale} />
-        <StatCard label={t.overview.monthSpend} value={currentMonthSpend} tone="expense" locale={locale} />
-        <StatCard label={t.overview.monthIncome} value={currentMonthIncome} tone="income" locale={locale} />
+        <StatCard label={t.overview.monthSpend} value={periodSpend} tone="expense" locale={locale} />
+        <StatCard label={t.overview.monthIncome} value={periodIncome} tone="income" locale={locale} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
